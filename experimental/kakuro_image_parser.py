@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
+import math
 
 def _angle_cos(p0, p1, p2):
     d1, d2 = (p0-p1).astype('float'), (p2-p1).astype('float')
-    return abs( np.dot(d1, d2) / np.sqrt( np.dot(d1, d1)*np.dot(d2, d2) ) )
+    return np.dot(d1, d2) / np.sqrt( np.dot(d1, d1)*np.dot(d2, d2) )
 
 
 def _average_x_y(squares):
@@ -62,20 +63,52 @@ class kakuroImageParser(object):
             cnt = cv2.approxPolyDP(cnt, 0.02*cnt_len, True)
             if len(cnt) == 4 and cv2.contourArea(cnt) > 1000 and cv2.isContourConvex(cnt):
                 cnt2 = cnt.reshape(-1, 2)
-                max_cos = np.max([_angle_cos( cnt2[i], cnt2[(i+1) % 4], cnt2[(i+2) % 4] ) for i in xrange(4)])
+                max_cos = np.max([abs(_angle_cos( cnt2[i], cnt2[(i+1) % 4], cnt2[(i+2) % 4] )) for i in xrange(4)])
                 if max_cos < 0.1:
                     squares.append(cnt)
         return squares
 
+    def _get_slant(self):
+        squares = self._find_squares()
+        square_size = [ (cv2.contourArea(square), square) for square in squares ]
+        square_size = sorted(square_size, key = lambda s: s[0], reverse=True)
+        # take the second largest as the largest may be a image frame
+        square = square_size[1][1]
+        p1 = square[0][0]
+        p2 = square[1][0]
+        print '**** _get_slant'
+        print '\t', p1, p2
+        if abs(p1[0] - p2[0]) <= abs(p1[1] - p2[1]):
+            # vertical
+            if p2[1] < p1[1]:
+                tmp = p1
+                p1 = p2
+                p2 = tmp
+            v = np.array([p1[0], p2[1]])
+            slant = _angle_cos(v, p1, p2)
+        else:
+            # horizontal
+            if p2[0] < p1[0]:
+                tmp = p1
+                p1 = p2
+                p2 = tmp
+            v = np.array([p2[0], p1[1]])
+            slant = _angle_cos(v, p1, p2)
+        print '\t', slant
+        slant = math.degrees(math.acos(slant))
+        print '\t', slant
+        return slant
+
+    def _rotate_img(self, degree):
+        h, w, c  = self._img.shape
+        print '\t', w, h, c
+        rotmat = cv2.getRotationMatrix2D((w/2, h/2), degree, 1.0)
+        self._img = cv2.warpAffine(self._img, rotmat, (w, h))
+
     def _get_possible_frames(self):
         raw_squares = self._find_squares()
-        squares = []
-        for raw_square in raw_squares:
-            squares.append( (cv2.contourArea(raw_square), cv2.boundingRect(raw_square)) )
+        squares = [(cv2.contourArea(raw_square), cv2.boundingRect(raw_square)) for raw_square in raw_squares]
         squares = sorted(squares, key = lambda s: s[0], reverse=True)
-        print 'squares in image'
-        for s in squares:
-            print '\t',s
         frames = dict()
         for s in squares:
             parent = None
@@ -91,7 +124,7 @@ class kakuroImageParser(object):
                 else:
                     del frames[parent]
             frames[s] = []
-        for f in iter(frames):
+        for f in frames.keys():
             if len(frames[f]) == 0:
                 del frames[f]
         return frames
@@ -121,7 +154,16 @@ class kakuroImageParser(object):
             self._frames.append( (frame[1], side, xs, ys) )
 
     def _parse(self):
+        degree = self._get_slant()
+        self._rotate_img(-degree)
         frames = self._get_possible_frames()
+        first = frames.keys()[0][1]
+        print first
+        cos = _angle_cos(
+                np.array([first[0], first[3]]),
+                np.array([first[0], first[1]]),
+                np.array([first[2], first[1]]) )
+        print 'Angle: ', cos
         print 'frames: ', len(frames)
         for f in frames:
             print '\t', f, len(frames[f])
@@ -133,7 +175,23 @@ class kakuroImageParser(object):
             self._b_parsed = True
         return self._frames
 
+    @property
+    def image(self):
+        return self._img
+
 if __name__ == '__main__':
+    def draw_frame(img, frame):
+        print frame[0]
+        f = [frame[0][0], frame[0][1], frame[0][2], frame[0][3]]
+        cv2.rectangle( img,
+                (frame[0][0], frame[0][1]),
+                (frame[0][0]+frame[0][2], frame[0][1]+frame[0][3]),
+                (255, 0, 0), 3 )
+        side = frame[1]
+        for x in frame[2]:
+            for y in frame[3]:
+                cv2.rectangle( img, (x, y), (x + side, y + side), (0, 0, 255), 1)
+
     import sys
     flist = sys.argv[1:]
     if len(flist) == 0:
@@ -146,16 +204,15 @@ if __name__ == '__main__':
         frames = parser.get_frames()
         print 'Frames:'
         print frames
+        img = parser.image.copy()
         for frame in frames:
-            print frame[0]
-            f = [frame[0][0], frame[0][1], frame[0][2], frame[0][3]]
-            cv2.rectangle( img,
-                    (frame[0][0], frame[0][1]),
-                    (frame[0][0]+frame[0][2], frame[0][1]+frame[0][3]),
-                    (255, 0, 0), 3 )
-            
+            draw_frame(img, frame)
+        h, w, c = img.shape
+        if h > 1000:
+            w = w * 1000 / h
+            h = 1000
+            img = cv2.resize(img, (w,h))
         cv2.imshow('Kakuro', img)
         ch = 0xFF & cv2.waitKey()
         cv2.destroyAllWindows()
-
 
