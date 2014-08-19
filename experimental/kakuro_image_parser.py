@@ -47,16 +47,16 @@ class kakuroImageParser(object):
 
     def _find_squares(self):
         img = cv2.cvtColor(self._img, cv2.COLOR_BGR2GRAY)
-        img = cv2.GaussianBlur(img, (3, 3), 0)
+        img = cv2.GaussianBlur(img, (5, 5), 0)
         squares = []
         img = cv2.dilate(img, None)
         img = cv2.adaptiveThreshold(
                 img,
                 maxValue=255,
-                adaptiveMethod=cv2.ADAPTIVE_THRESH_MEAN_C,
+                adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                 thresholdType = cv2.THRESH_BINARY,
                 blockSize =5,
-                C = 2)
+                C = 1)
         contours, hierarchy = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
             cnt_len = cv2.arcLength(cnt, True)
@@ -80,22 +80,17 @@ class kakuroImageParser(object):
         print '\t', p1, p2
         if abs(p1[0] - p2[0]) <= abs(p1[1] - p2[1]):
             # vertical
-            if p2[1] < p1[1]:
-                tmp = p1
-                p1 = p2
-                p2 = tmp
-            v = np.array([p1[0], p2[1]])
-            slant = _angle_cos(v, p1, p2)
-        else:
-            # horizontal
-            if p2[0] < p1[0]:
-                tmp = p1
-                p1 = p2
-                p2 = tmp
-            v = np.array([p2[0], p1[1]])
-            slant = _angle_cos(v, p1, p2)
-        print '\t', slant
-        slant = math.degrees(math.acos(slant))
+            tmp = p1[0]
+            p1[0] = p1[1]
+            p1[1] = p2[0]
+            p2[0] = p2[1]
+            p2[1] = tmp
+        # horizontal
+        if p2[0] < p1[0]:
+            tmp = p1
+            p1 = p2
+            p2 = tmp
+        slant = math.degrees(math.atan2(p2[1]-p1[1], p2[0]-p1[0]))
         print '\t', slant
         return slant
 
@@ -106,9 +101,12 @@ class kakuroImageParser(object):
         self._img = cv2.warpAffine(self._img, rotmat, (w, h))
 
     def _get_possible_frames(self):
+        print '_get_possible_frames'
         raw_squares = self._find_squares()
+        print '\t# of raw_square=', len(raw_squares)
         squares = [(cv2.contourArea(raw_square), cv2.boundingRect(raw_square)) for raw_square in raw_squares]
         squares = sorted(squares, key = lambda s: s[0], reverse=True)
+        print '\t# of square=', len(squares)
         frames = dict()
         for s in squares:
             parent = None
@@ -155,7 +153,7 @@ class kakuroImageParser(object):
 
     def _parse(self):
         degree = self._get_slant()
-        self._rotate_img(-degree)
+        self._rotate_img(degree)
         frames = self._get_possible_frames()
         first = frames.keys()[0][1]
         print first
