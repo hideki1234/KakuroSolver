@@ -44,25 +44,31 @@ class kakuroCellParser(object):
               ]
             )
         '''
+        def _cell_brightness():
+            brightness = np.int64(0)
+            for yofs in xrange(y, y+cell_side):
+                for xofs in xrange(x, x+cell_side):
+                    brightness = brightness + img[yofs][xofs]
+            brightness = brightness / cell_side ** 2
+            return brightness
+
         outer_frame, cell_side, xs, ys = org_frame
-        print "_parse_a_frame: not implemented yet"
-        print outer_frame, cell_side, len(xs), len(ys)
         # get dark ness of cells
-        cells = []
+        brs = []
         avg = 0
         for y in ys:
             row = []
             for x in xs:
-                brightness = np.int64(0)
-                for yofs in xrange(cell_side):
-                    for xofs in xrange(cell_side):
-                        brightness = brightness + img[y + yofs][x + xofs]
-                brightness = brightness / cell_side ** 2
-                row.append( (x, y, brightness) )
+                brightness = _cell_brightness()
+                row.append( brightness )
                 avg = avg + brightness
-            cells.append( row )
-        avg = avg / (len(xw) * len(ys))
+            brs.append( row )
+        avg = avg / (len(xs) * len(ys))
+        
+        cells = [ [ (xs[j], ys[i], brs[i][j] < avg) for j in xrange(len(xs)) ]
+                for i in xrange(len(ys)) ]
 
+        self._frames.append( (outer_frame, cell_side, cells) )
 
     @property
     def image(self):
@@ -70,6 +76,20 @@ class kakuroCellParser(object):
 
 
 if __name__ == '__main__':
+    def draw_frame(img, frame):
+        print frame[0]
+        # draw frame
+        f = [frame[0][0], frame[0][1], frame[0][2], frame[0][3]]
+        cv2.rectangle( img,
+                (frame[0][0], frame[0][1]),
+                (frame[0][0]+frame[0][2], frame[0][1]+frame[0][3]),
+                (0, 255, 0), 3 )
+        side = frame[1]
+        for row in frame[2]:
+            for x,y,b_clue in row:
+                color, thick = ((0, 0, 255), 2) if b_clue else ((255, 0, 0), 1)
+                cv2.rectangle( img, (x, y), (x + side, y + side), color, thick)
+
     import sys
     flist = sys.argv[1:]
     if len(flist) == 0:
@@ -83,6 +103,8 @@ if __name__ == '__main__':
         print 'Frames:'
         print frames
         img = detector.image.copy()
+        for frame in frames:
+            draw_frame(img, frame)
         h, w, c = img.shape
         if h > 1000:
             w = w * 1000 / h
