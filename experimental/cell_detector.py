@@ -95,7 +95,7 @@ if __name__ == '__main__':
     if len(flist) == 0:
         import os
         from glob import glob
-        flist = glob(os.path.join('~', 'Documents', 'kakuro', 'testdata', '*.jpg'))
+        flist = glob(os.path.join('..', 'testimage', '*.*'))
     for fn in flist:
         img = cv2.imread(fn)
         detector = kakuroCellParser(img)
