@@ -4,10 +4,12 @@ import cv2
 import numpy as np
 from cell_detector import kakuroCellParser
 
-class clue_extractor(object):
+class clueExtractor(object):
     """
     extracts clue cell images from a kakuro image
     """
+
+    _size = 32
 
     def __init__(self, img):
         parser = kakuroCellParser(img)
@@ -43,6 +45,7 @@ class clue_extractor(object):
             print x, y
             if b_clue:
                 a_cell = self._img[y:y+self._side, x:x+self._side]
+                a_cell = cv2.resize(a_cell, (self._size, self._size))
                 return a_cell
 
 if __name__ == '__main__':
@@ -54,7 +57,7 @@ if __name__ == '__main__':
         flist = glob(os.path.join('..', 'testimage', '*.*'))
     for fn in flist:
         img = cv2.imread(fn)
-        extractor = clue_extractor(img)
+        extractor = clueExtractor(img)
         for cell in extractor:
             cv2.imshow('Kakuro', cell)
             ch = 0xFF & cv2.waitKey()
