@@ -13,8 +13,6 @@ if train_data_dir == None:
     print 'Please set an environment variable: ', train_dir_name
     sys.exit(1)
 
-print os.path.join(train_data_dir, 'my.png')
-
 # get the source kakukro images
 source_dir_name = 'KAKURO_IMAGE_DIR'
 
@@ -30,11 +28,9 @@ if len(flist) == 0:
 base_name = 0
 for fn in flist:
     img = cv2.imread(fn)
+    print '**** ', fn, ' ****'
     for cell in clueExtractor(img):
         fn_data = str(base_name) + '.png'
         base_name = base_name + 1
         path_data = os.path.join(train_data_dir, fn_data)
-        print path_data
-        cv2.imshow('Kakuro', cell)
         cv2.imwrite(path_data, cell)
-    cv2.destroyAllWindows()

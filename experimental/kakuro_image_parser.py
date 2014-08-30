@@ -157,6 +157,8 @@ class kakuroImageParser(object):
         degree = self._get_slant()
         self._rotate_img(degree)
         frames = self._get_possible_frames()
+        if len(frames) == 0:
+            return
         first = frames.keys()[0][1]
         print first
         cos = _angle_cos(
