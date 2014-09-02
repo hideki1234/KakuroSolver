@@ -3,14 +3,13 @@
 import sys
 import os
 import cv2
-import numpy as np
 from clue_extract import clueExtractor
 
 # set up the directory to store training images
-train_dir_name = 'KAKURO_TRAIN_DIR'
-train_data_dir = os.getenv(train_dir_name)
-if train_data_dir == None:
-    print 'Please set an environment variable: ', train_dir_name
+cell_dir_name = 'KAKURO_CELL_DIR'
+cell_data_dir = os.getenv(cell_dir_name)
+if cell_data_dir == None:
+    print 'Please set an environment variable: ', cell_dir_name
     sys.exit(1)
 
 # get the source kakukro images
@@ -32,5 +31,5 @@ for fn in flist:
     for cell in clueExtractor(img):
         fn_data = str(base_name) + '.png'
         base_name = base_name + 1
-        path_data = os.path.join(train_data_dir, fn_data)
+        path_data = os.path.join(cell_data_dir, fn_data)
         cv2.imwrite(path_data, cell)
