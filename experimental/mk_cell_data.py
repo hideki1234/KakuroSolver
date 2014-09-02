@@ -29,7 +29,7 @@ for fn in flist:
     img = cv2.imread(fn)
     print '**** ', fn, ' ****'
     for cell in clueExtractor(img):
-        fn_data = str(base_name) + '.png'
+        fn_data = str(base_name) + '.pgm'
         base_name = base_name + 1
         path_data = os.path.join(cell_data_dir, fn_data)
         cv2.imwrite(path_data, cell)
