@@ -1,5 +1,13 @@
 #!/usr/bin/env python
+"""
+Shows images in a directory specified by an env var, KAKURO_CELL_DIR
+You enter clue values for each image. Values are 0, or 3 to 45. 0 means no clue.
+The result is a csv file. Each row has an image file name, lower left clue,
+and upper right clue.
+"""
+
 import os
+import csv
 from glob import glob
 from Tkinter import *
 
@@ -10,12 +18,21 @@ class Application(Frame):
     def set_value(self):
         lb = self.num_lb.get()
         ur = self.num_ur.get()
-        print "{}: {} {}".format(self.image_name, lb, ur)
-        self.num_lb.delete(0, len(lb))
-        self.num_lb.insert(0, def_num)
-        self.num_ur.delete(0, len(ur))
-        self.num_ur.insert(0, def_num)
-        self.show_image()
+        # validate values
+        try:
+            lb_v = int(lb)
+            ur_v = int(ur)
+            if not (lb_v == 0 or (lb_v >=3 and lb_v <= 45)):
+                raise ValueError('lower left value out of range')
+            if not (ur_v == 0 or (ur_v >=3 and ur_v <= 45)):
+                raise ValueError('upper right value out of range')
+        except ValueError as e:
+            print e
+            self.set_initial_input_state()
+        else:
+            print "{}: {},{}".format(self.image_name, lb, ur)
+            self.writer.writerow([self.image_name, lb_v, ur_v])
+            self.show_image()
 
     def createWidgets(self):
         # Quit button
@@ -52,18 +69,29 @@ class Application(Frame):
         # show the first image
         self.show_image()
 
+    def set_initial_input_state(self):
+        lb = self.num_lb.get()
+        ur = self.num_ur.get()
+        self.num_lb.delete(0, len(lb))
+        self.num_lb.insert(0, def_num)
+        self.num_ur.delete(0, len(ur))
+        self.num_ur.insert(0, def_num)
+        self.num_lb.focus_set()
+        self.num_lb.select_range(0,len(def_num))
+
     def show_image(self):
         try:
             self.image_name = self.image_i.next()
             self.image_data = PhotoImage(file = self.image_name)
             self.image_frame.configure(image = self.image_data)
-            self.num_lb.focus_set()
+            self.set_initial_input_state()
         except StopIteration:
             self.quit()
 
-    def __init__(self, images, master=None):
+    def __init__(self, master, images, f_out):
         Frame.__init__(self, master)
         self.image_i = images.__iter__()
+        self.writer = csv.writer(f_out)
         self.master.title('Make training data')
         self.pack()
         self.createWidgets()
@@ -75,8 +103,10 @@ if cell_data_dir == None:
     print 'Please set an environment variable: ', cell_dir_name
     sys.exit(1)
 flist = glob(os.path.join(cell_data_dir, '*.pgm'))
+fn_out = os.path.join(cell_data_dir, '0_train_set.csv')
 
-root = Tk()
-app = Application(flist, root)
-app.mainloop()
-root.destroy()
+with open(fn_out, 'wb') as f_out:
+    root = Tk()
+    app = Application(root, flist, f_out)
+    app.mainloop()
+    root.destroy()
