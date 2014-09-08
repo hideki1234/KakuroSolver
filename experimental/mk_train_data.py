@@ -8,6 +8,7 @@ and upper right clue.
 
 import os
 import csv
+import shutil
 from glob import glob
 from Tkinter import *
 
@@ -32,6 +33,7 @@ class Application(Frame):
         else:
             print "{}: {},{}".format(self.image_name, lb, ur)
             self.writer.writerow([self.image_name, lb_v, ur_v])
+            self.move_done()
             self.show_image()
 
     def createWidgets(self):
@@ -79,6 +81,9 @@ class Application(Frame):
         self.num_lb.focus_set()
         self.num_lb.select_range(0,len(def_num))
 
+    def move_done(self):
+        shutil.move(self.image_name, self.dn_done)
+
     def show_image(self):
         try:
             self.image_name = self.image_i.next()
@@ -88,8 +93,9 @@ class Application(Frame):
         except StopIteration:
             self.quit()
 
-    def __init__(self, master, images, f_out):
+    def __init__(self, master, images, f_out, dn_done):
         Frame.__init__(self, master)
+        self.dn_done = dn_done
         self.image_i = images.__iter__()
         self.writer = csv.writer(f_out)
         self.master.title('Make training data')
@@ -104,9 +110,11 @@ if cell_data_dir == None:
     sys.exit(1)
 flist = glob(os.path.join(cell_data_dir, '*.pgm'))
 fn_out = os.path.join(cell_data_dir, '0_train_set.csv')
+dn_done = os.path.join(cell_data_dir, 'done')
 
-with open(fn_out, 'wb') as f_out:
+filemode = 'ab' if os.path.exists(fn_out) else 'wb'
+with open(fn_out, filemode) as f_out:
     root = Tk()
-    app = Application(root, flist, f_out)
+    app = Application(root, flist, f_out, dn_done)
     app.mainloop()
     root.destroy()
