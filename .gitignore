@@ -1,2 +1,7 @@
 *.pyc
 testimages/*
+*.sdf
+*.suo
+# Build results
+Debug/
+Release/
