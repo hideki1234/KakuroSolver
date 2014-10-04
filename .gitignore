@@ -5,3 +5,4 @@ testimages/*
 # Build results
 Debug/
 Release/
+*.opensdf
