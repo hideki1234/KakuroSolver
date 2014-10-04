@@ -31,15 +31,13 @@ namespace kakuro {
 	}
 
 	solverImpl_t::solverImpl_t(const board_t & boardData)
-		: m_cx(boardData.cx), m_cy(boardData.cy),
+        : m_cx(boardData.cx), m_cy(boardData.cy), m_initialBoard(new innerBoard_t(m_cx, m_cy)),
 		m_bSolved(false), m_eReq(REQEVENT_NONE), m_eh(nullptr), m_eventDataBoard(nullptr)
 	{
 		if(m_cx < 2 || m_cy < 2)
 			throw slvExceptionInvlideBoardData_t(slvExceptionInvlideBoardData_t::BOARD_SIZE);
 		if(boardData.pData == nullptr)
 			throw slvExceptionInvlideBoardData_t(slvExceptionInvlideBoardData_t::NO_BOARD_DATA);
-
-		std::unique_ptr<innerBoard_t> newBoard(new innerBoard_t(m_cx, m_cy));
 
 		for(size_t idx = 0; idx < (m_cx + 1) * (m_cy + 1); idx++) {
 			const size_t x = idx % (m_cx + 1);
@@ -64,10 +62,10 @@ namespace kakuro {
 					throw slvExceptionInvlideBoardData_t(slvExceptionInvlideBoardData_t::SUM4EMPTY, x, y);
 				if(cCell != 0) {
 					newCellSet = new innerCellSet_t(x, y, cCell, currentCell->sumRight);
-					newBoard->cellSetSet.push_back(newCellSet);
+					m_initialBoard->cellSetSet.push_back(newCellSet);
 					innerIdx = (y - 1) * m_cx + x;
 					for(ofs = 0; ofs < cCell; ofs++) {
-						innerCell_t * pCell = &newBoard->pCells[innerIdx + ofs];
+						innerCell_t * pCell = &m_initialBoard->pCells[innerIdx + ofs];
 						newCellSet->AddACell(pCell);
 						pCell->AddACellSet(newCellSet);
 					}
@@ -85,11 +83,11 @@ namespace kakuro {
 					throw slvExceptionInvlideBoardData_t(slvExceptionInvlideBoardData_t::SUM4EMPTY, x, y);
 				if(cCell != 0) {
 					newCellSet = new innerCellSet_t(x, y, cCell, currentCell->sumDown);
-					newBoard->cellSetSet.push_back(newCellSet);
+					m_initialBoard->cellSetSet.push_back(newCellSet);
 					innerIdx = y * m_cx + (x - 1);
 					for(ofs = 0; ofs < cCell; ofs++) {
-						innerCell_t * pCell = &newBoard->pCells[innerIdx + ofs * m_cx];
-						newBoard->undetCellSet.push_back(pCell);
+						innerCell_t * pCell = &m_initialBoard->pCells[innerIdx + ofs * m_cx];
+						m_initialBoard->undetCellSet.push_back(pCell);
 						newCellSet->AddACell(pCell);
 						pCell->AddACellSet(newCellSet);
 					}
@@ -101,8 +99,6 @@ namespace kakuro {
 					throw slvExceptionInvlideBoardData_t(slvExceptionInvlideBoardData_t::EDGE_CELL, x, y);
 			}
 		}
-
-		m_initialBoard = std::move(newBoard);
 	}
 
 	solverImpl_t::~solverImpl_t()
