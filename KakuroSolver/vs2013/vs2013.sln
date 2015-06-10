@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KakuroSolver_t", "KakuroSolver_t\KakuroSolver_t.vcxproj", "{F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KakuroSolver", "KakuroSolver\KakuroSolver.vcxproj", "{5960318E-639A-4641-AA85-CBBBA8268435}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E} = {F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testSolver", "testSolver\testSolver.vcxproj", "{543E0EF6-E4E8-44FA-AF4D-1B344A311F12}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E} = {F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testDLL", "testDLL\testDLL.vcxproj", "{8A801A27-8491-4125-B09C-17AA88331174}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5960318E-639A-4641-AA85-CBBBA8268435} = {5960318E-639A-4641-AA85-CBBBA8268435}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E}.Debug|Win32.Build.0 = Debug|Win32
+		{F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E}.Release|Win32.ActiveCfg = Release|Win32
+		{F8FEDBC6-16B3-48AE-9A51-2A22116F8F8E}.Release|Win32.Build.0 = Release|Win32
+		{5960318E-639A-4641-AA85-CBBBA8268435}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5960318E-639A-4641-AA85-CBBBA8268435}.Debug|Win32.Build.0 = Debug|Win32
+		{5960318E-639A-4641-AA85-CBBBA8268435}.Release|Win32.ActiveCfg = Release|Win32
+		{5960318E-639A-4641-AA85-CBBBA8268435}.Release|Win32.Build.0 = Release|Win32
+		{543E0EF6-E4E8-44FA-AF4D-1B344A311F12}.Debug|Win32.ActiveCfg = Debug|Win32
+		{543E0EF6-E4E8-44FA-AF4D-1B344A311F12}.Debug|Win32.Build.0 = Debug|Win32
+		{543E0EF6-E4E8-44FA-AF4D-1B344A311F12}.Release|Win32.ActiveCfg = Release|Win32
+		{543E0EF6-E4E8-44FA-AF4D-1B344A311F12}.Release|Win32.Build.0 = Release|Win32
+		{8A801A27-8491-4125-B09C-17AA88331174}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A801A27-8491-4125-B09C-17AA88331174}.Debug|Win32.Build.0 = Debug|Win32
+		{8A801A27-8491-4125-B09C-17AA88331174}.Release|Win32.ActiveCfg = Release|Win32
+		{8A801A27-8491-4125-B09C-17AA88331174}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
