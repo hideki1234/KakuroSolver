@@ -2,6 +2,8 @@
 testimages/*
 *.sdf
 *.suo
+# vim temp file
+*.swp
 # Build results
 Debug/
 Release/
