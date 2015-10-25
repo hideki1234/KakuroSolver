@@ -8,8 +8,8 @@
 
 #include <iostream>
 #include <memory>
-#include "..\KakuroSolver_t\kkrsolv_t.h"
-#include "..\KakuroSolver_t\solvimpl.h"
+#include "../KakuroSolver_t/kkrsolv_t.h"
+#include "../KakuroSolver_t/solvimpl.h"
 #include "testSlv.h"
 
 using namespace kakuro;
@@ -91,7 +91,7 @@ static bool testACtor(const unsigned * const data, const size_t * const indeces,
 
 	MakeDataBoard(testBoard, data);
 
-	const unsigned * val;
+	const size_t * val;
 	indexSet_t indecesExpected;
 	c = indeces[0];
 	for(val = indeces + 1; c-- > 0; ++val)

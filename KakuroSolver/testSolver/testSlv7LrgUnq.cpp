@@ -9,8 +9,8 @@
 /***************************************************************************/
 #include <iostream>
 #include <memory>
-#include "..\KakuroSolver_t\kkrsolv_t.h"
-#include "..\KakuroSolver_t\solvimpl.h"
+#include "../KakuroSolver_t/kkrsolv_t.h"
+#include "../KakuroSolver_t/solvimpl.h"
 #include "testSlv.h"
 
 using namespace kakuro;

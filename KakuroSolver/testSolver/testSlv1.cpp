@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <memory>
-#include "..\KakuroSolver_t\kkrsolv_t.h"
+#include "../KakuroSolver_t/kkrsolv_t.h"
 #include "testSlv.h"
 
 bool test1()

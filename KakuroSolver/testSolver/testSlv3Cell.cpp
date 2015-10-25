@@ -9,8 +9,8 @@
 #include <iostream>
 #include <array>
 #include <memory>
-#include "..\KakuroSolver_t\kkrsolv_t.h"
-#include "..\KakuroSolver_t\innerbrd.h"
+#include "../KakuroSolver_t/kkrsolv_t.h"
+#include "../KakuroSolver_t/innerbrd.h"
 #include "testSlv.h"
 
 static bool testCtor()

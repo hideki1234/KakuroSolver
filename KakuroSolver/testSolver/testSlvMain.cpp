@@ -9,7 +9,7 @@
 #include <iostream>
 #include <list>
 #include <utility>
-#include "..\KakuroSolver_t\kkrsolv_t.h"
+#include "../KakuroSolver_t/kkrsolv_t.h"
 #include "testSlv.h"
 
 using namespace kakuro;
