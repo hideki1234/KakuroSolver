@@ -6,7 +6,7 @@ CPPFLAGS = -c -std=c++11
 
 ifdef DEBUG
 	BUILD_DIR=Debug
-	CPPFLAGS += -g -O0
+	CPPFLAGS += -g -O0 -D_DEBUG
 else
 	BUILD_DIR=Release
 	CPPFLAGS += -O3
@@ -24,7 +24,7 @@ SOLVER_OBJS = innerbrd.o kkrsolv_t.o slvfactr.o solvimpl.o version.o
 SOLVER_DIR = ../KakuroSolver_t
 SOLVER_BLD_OBJS = $(addprefix $(BUILD_DIR)/, $(SOLVER_OBJS))
 
-$(BUILD_DIR)/%.o : $(SOLVER_DIR)/%.cpp
+$(BUILD_DIR)/%.o : $(SOLVER_DIR)/%.cpp $(SOLVER_DIR)/kkrsolv_t.h $(SOLVER_DIR)/innerbrd.h
 	$(CPP) -I$(SOLVER_DIR) $(CPPFLAGS) -o $@ $<
 
 $(BUILD_DIR)/libkkrs.a : $(SOLVER_BLD_OBJS)
