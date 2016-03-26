@@ -1,10 +1,14 @@
 *.pyc
 testimages/*
-*.sdf
-*.suo
 # vim temp file
 *.swp
+#
+## Visual Studio
+*.sdf
+*.opendb
+*.suo
+*.user
 # Build results
-Debug/
-Release/
+[Dd]ebug/
+[Rr]elease/
 *.opensdf
